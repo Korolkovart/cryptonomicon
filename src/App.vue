@@ -24,7 +24,7 @@
               placeholder="Например DOGE"
             />
           </div>
-          <div class="flex bg-white shadow-md p-1 rounded-md shadow-md flex-wrap">
+          <div v-if="searchSubTickers().length" class="flex bg-white shadow-md p-1 rounded-md shadow-md flex-wrap">
             <span
             v-for="(sub, idx) in searchSubTickers()"
             :key="sub+idx" 
@@ -202,7 +202,7 @@ export default {
     
       const urlData = Object.fromEntries(new URL(window.location).searchParams.entries())
       if(urlData.filter) this.filter = urlData.filter;
-      if(urlData.page) this.page = urlData.page;
+      if(urlData.page) this.page = Number(urlData.page);
     },
     watch: {
       ticker() {
@@ -247,13 +247,13 @@ export default {
       },
       add() {
         const currentTicker = {
-          name: this.ticker,
+          name: this.ticker.toUpperCase(),
           price: "-"
         };
-        const checkingStatus = this.tickers.some(t => t.name === this.ticker);
+        const checkingStatus = this.tickers.some(t => t.name.toUpperCase() === this.ticker.toUpperCase());
         if(checkingStatus){
           this.checkStatus = true;
-        } else {
+        } else if (this.ticker.length){
           this.checkStatus = false;
           this.tickers.push(currentTicker);
           localStorage.setItem("cryptonomicon-list", JSON.stringify(this.tickers));
@@ -287,10 +287,16 @@ export default {
         }
         return result
       },
-      chooseSubTickers(ticker){
-          this.ticker = ticker;
-          this.add(ticker);
+      chooseSubTickers(sub){
+          const checkingStatus = this.tickers.some(t => t.name.toUpperCase() === sub.toUpperCase());
+        if(checkingStatus){
+          this.checkStatus = true;
+        } else{
+          this.checkStatus = false;
+          this.ticker = sub.toUpperCase();
+          this.add();
       }
+    } 
   }
 }
 </script>
