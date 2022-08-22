@@ -205,8 +205,6 @@ export default {
           this[key] = urlData[key];
         }
       })
-      // if(urlData.filter) this.filter = urlData.filter;
-      // if(urlData.page) this.page = Number(urlData.page);
       const localStorageData = localStorage.getItem("cryptonomicon-list");
       if(localStorageData){
         this.tickers = JSON.parse(localStorageData);
@@ -214,7 +212,6 @@ export default {
           subscribeToTicker(ticker.name, (newPrice) =>
            this.updateTicker(ticker.name, newPrice))
         })
-          // setInterval(this.updateTickers, 5000)
       }
     },
     watch: {
@@ -280,27 +277,15 @@ export default {
       updateTicker(tickerName, price) {
         this.tickers.filter(t => t.name === tickerName)
           .forEach(el => {
+            if(el === this.selectedTicker){
+              this.graph.push(price)
+            }
             el.price = price
           })
       },
       formatPrice(price) {
         if(price === "-") return price;
         return price > 1 ? price.toFixed(2) : price.toPrecision(2);
-      },
-      async updateTickers() {
-        // if(!this.tickers.length){
-        //   return;
-        // }      
-        //   const exchangeData = await loadTickers(this.tickers.map(t => t.name))
-        //   this.tickers.forEach(ticker => {
-        //     const price = exchangeData[ticker.name.toUpperCase()]
-        //     ticker.price = price ?? "-";
-        //   })
-
- 
-      //     if(this.selectedTicker?.name === tickerName){
-      //       this.graph.push(exchangeData.USD)
-      //     }
       },
       add() {
         const currentTicker = {
@@ -315,7 +300,6 @@ export default {
           this.tickers = [...this.tickers, currentTicker];
           subscribeToTicker(currentTicker.name, (newPrice) =>
            this.updateTicker(currentTicker.name, newPrice))
-          // this.subscribeToUpdates(currentTicker.name)
           this.ticker = "";
           this.filter = "";
         }
